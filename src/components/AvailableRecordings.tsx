@@ -15,9 +15,8 @@ interface AvailableRecordingsProps {
   onLocationClick: (location: string) => void;
 }
 
-const MAILCHIMP_SCRIPT =
-  "const MAILCHIMP_SCRIPT =
-  "https://chimpstatic.com/mcjs-connected/js/users/30e5b89b891e7b961c63e7d39/2318c630b0adc777855362be3.js";
+// Fixed syntax error
+const MAILCHIMP_SCRIPT = "https://chimpstatic.com/mcjs-connected/js/users/30e5b89b891e7b961c63e7d39/2318c630b0adc777855362be3.js";
 
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
@@ -40,27 +39,64 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
     if (!document.getElementById("mcjs")) {
       const script = document.createElement("script");
       script.id = "mcjs";
-      script.src = MAILCHIMP_SCRIPT;
-      script.async = true;
-      document.body.appendChild(script);
+      script.innerHTML = `
+        !function(c,h,i,m,p){
+          m=c.createElement(h),
+          p=c.getElementsByTagName(h)[0],
+          m.async=1,
+          m.src=i,
+          p.parentNode.insertBefore(m,p)
+        }(document,"script","${MAILCHIMP_SCRIPT}");
+      `;
+      document.head.appendChild(script);
+      
+      // Fixed cleanup function
       return () => {
-        document.body.removeChild(script);
+        const existingScript = document.getElementById("mcjs");
+        if (existingScript) {
+          existingScript.remove();
+        }
       };
     }
   }, []);
 
-  // Play button click handler
-  const handlePlayClick = () => {
+  // Fixed play button - should play audio, not show email subscription
+  const handlePlayClick = (recordUrl: string) => {
+    // Create audio element and play
+    const audio = new Audio(recordUrl);
+    audio.play().catch(error => {
+      console.error('Error playing audio:', error);
+      alert('Unable to play audio file');
+    });
+  };
+
+  // Separate email subscription trigger function
+  const handleSubscribeClick = () => {
     if (window.mcpopup) {
       window.mcpopup.open();
+    } else if (window.mc4wp) {
+      window.mc4wp.forms.show();
     } else {
       console.warn("Mailchimp popup not ready yet");
+      alert("Email subscription feature is loading, please try again later");
     }
   };
-  
 
   return (
     <div className="mt-6 w-full">
+      {/* Email subscription button - placed above table */}
+      <div className="mb-4 text-center">
+        <button
+          onClick={handleSubscribeClick}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+        >
+          📧 Subscribe to Updates
+        </button>
+        <p className="text-sm text-gray-600 mt-1">
+          Get notified about new recordings
+        </p>
+      </div>
+
       <div className="border border-gray-200 rounded-2xl p-4 shadow-md w-full">
         <h3 className="text-xl font-semibold text-gray-800 mb-3 text-left">
           Available Recordings
@@ -96,9 +132,11 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                 <td className="p-2 border">{rec.noiseLevel}</td>
                 <td className="p-2 border">{rec.clipLength}</td>
                 <td className="p-2 border w-24">
+                  {/* Fixed play button - now actually plays audio */}
                   <button
-                    onClick={handlePlayClick}
+                    onClick={() => handlePlayClick(rec.recordUrl)}
                     className="text-black hover:text-green-600 p-2"
+                    title="Play recording"
                   >
                     <svg
                       width="20"
@@ -115,6 +153,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                     href={rec.recordUrl}
                     download
                     className="text-black hover:text-blue-600 p-2 flex justify-center items-center"
+                    title="Download recording"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -179,6 +218,14 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Debug information */}
+      <div className="mt-4 p-3 bg-gray-100 rounded text-sm text-gray-600">
+        <p><strong>Debug Info:</strong></p>
+        <p>• Mailchimp script loaded: {document.getElementById("mcjs") ? "✅" : "❌"}</p>
+        <p>• If email subscription doesn't work, check browser console for errors</p>
+        <p>• Make sure Connected Sites is configured in your Mailchimp dashboard</p>
       </div>
     </div>
   );
