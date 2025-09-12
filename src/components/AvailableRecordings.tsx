@@ -60,10 +60,6 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 
       document.body.appendChild(script);
 
-      return () => {
-        const existingScript = document.getElementById("mcjs");
-        if (existingScript) existingScript.remove();
-      };
     }
   }, []);
 
