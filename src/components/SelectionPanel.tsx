@@ -3,7 +3,7 @@ import AudioWavePlayer from './AudioWavePlayer';
 import AvailableRecordings from './AvailableRecordings';
 
 // AutoComplete input for Vessel
-const VesselInput = ({ options, value, onChange, placeholder }: any) => {
+const VesselInput = ({ options, onChange, placeholder }: any) => {
   const [inputValue, setInputValue] = useState('');
   const [filteredOptions, setFilteredOptions] = useState<any[]>([]);
   const [showOptions, setShowOptions] = useState(false);

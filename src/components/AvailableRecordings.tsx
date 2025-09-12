@@ -23,7 +23,6 @@ interface SubscriptionData {
 
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
-  onPlay,
   onLocationClick,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,18 +42,18 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
     if (pageNumber >= 1 && pageNumber <= totalPages) setCurrentPage(pageNumber);
   };
 
-  // 点击 Play 弹出 popup
+ 
   const handlePlayClick = () => {
     setShowPopup(true);
   };
 
-  // Mailchimp 提交
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const form = document.createElement("form");
     form.action =
-      "https://YOUR_MAILCHIMP_URL_HERE"; // 替换成你的 Mailchimp 表单 action
+      "https://YOUR_MAILCHIMP_URL_HERE"; 
     form.method = "POST";
     form.target = "_blank";
 
