@@ -104,18 +104,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 
   return (
     <div className="mt-6 w-full">
-      <div className="mb-4 text-center">
-        <button
-          onClick={handleSubscribeClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
-        >
-          📧 Subscribe to Updates
-        </button>
-        <p className="text-sm text-gray-600 mt-1">
-          Get notified about new recordings
-        </p>
-      </div>
-
+     
       <div className="border border-gray-200 rounded-2xl p-4 shadow-md w-full">
         <h3 className="text-xl font-semibold text-gray-800 mb-3 text-left">
           Available Recordings
