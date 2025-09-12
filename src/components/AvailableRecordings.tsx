@@ -250,6 +250,20 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
         <p>• Mailchimp script loaded: {document.getElementById("mcjs") ? "✅" : "❌"}</p>
         <p>• If email subscription doesn't work, check browser console for errors</p>
         <p>• Make sure Connected Sites is configured in your Mailchimp dashboard</p>
+        
+        <button
+          onClick={() => {
+            const win = window as any;
+            console.log('All window properties with "mc":', Object.keys(win).filter(key => key.toLowerCase().includes('mc')));
+            const hasPopup = !!win.mcpopup;
+            const hasMc4wp = !!win.mc4wp;
+            const hasMailChimp = !!win.MailChimp;
+            alert(`Debug: mcpopup=${hasPopup}, mc4wp=${hasMc4wp}, MailChimp=${hasMailChimp}`);
+          }}
+          className="mt-2 bg-gray-500 text-white px-3 py-1 rounded text-xs"
+        >
+          Debug Mailchimp Objects
+        </button>
       </div>
     </div>
   );
