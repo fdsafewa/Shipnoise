@@ -39,7 +39,6 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   onPlay,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [mailchimpReady, setMailchimpReady] = useState(false);
 
   const recordsPerPage = 5;
   const indexOfLast = currentPage * recordsPerPage;
@@ -58,11 +57,6 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
       script.id = "mcjs";
       script.src = MAILCHIMP_SCRIPT;
       script.async = true;
-
-      script.onload = () => {
-        console.log("Mailchimp loaded!");
-        setMailchimpReady(true);
-      };
 
       document.body.appendChild(script);
 
@@ -83,22 +77,6 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
         console.error("Error playing audio:", error);
         alert("Unable to play audio file");
       });
-    }
-  };
-
-  // Mailchimp subscribe button handler
-  const handleSubscribeClick = () => {
-    if (!mailchimpReady) {
-      alert("Email subscription is still loading, please wait...");
-      return;
-    }
-
-    if (window.mcpopup) {
-      window.mcpopup.open();
-    } else if (window.mc4wp) {
-      window.mc4wp.forms.show();
-    } else {
-      alert("Mailchimp popup not available");
     }
   };
 
