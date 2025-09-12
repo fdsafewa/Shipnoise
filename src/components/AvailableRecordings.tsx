@@ -13,7 +13,7 @@ type Recording = {
 interface AvailableRecordingsProps {
   recordings: Recording[];
   onLocationClick: (location: string) => void;
-  onPlay?: (url: string) => void; // Added optional onPlay prop
+  onPlay?: (url: string) => void;
 }
 
 // Extend Window interface for Mailchimp objects
@@ -30,15 +30,16 @@ declare global {
   }
 }
 
-// Fixed syntax error
-const MAILCHIMP_SCRIPT = "https://chimpstatic.com/mcjs-connected/js/users/30e5b89b891e7b961c63e7d39/2318c630b0adc777855362be3.js";
+const MAILCHIMP_SCRIPT =
+  "https://chimpstatic.com/mcjs-connected/js/users/30e5b89b891e7b961c63e7d39/2318c630b0adc777855362be3.js";
 
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
   onLocationClick,
-  onPlay, // Added onPlay prop
+  onPlay,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [mailchimpReady, setMailchimpReady] = useState(false);
 
   const recordsPerPage = 5;
   const indexOfLast = currentPage * recordsPerPage;
@@ -55,60 +56,54 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
     if (!document.getElementById("mcjs")) {
       const script = document.createElement("script");
       script.id = "mcjs";
-      script.innerHTML = `
-        !function(c,h,i,m,p){
-          m=c.createElement(h),
-          p=c.getElementsByTagName(h)[0],
-          m.async=1,
-          m.src=i,
-          p.parentNode.insertBefore(m,p)
-        }(document,"script","${MAILCHIMP_SCRIPT}");
-      `;
-      document.head.appendChild(script);
-      
-      // Fixed cleanup function
+      script.src = MAILCHIMP_SCRIPT;
+      script.async = true;
+
+      script.onload = () => {
+        console.log("Mailchimp loaded!");
+        setMailchimpReady(true);
+      };
+
+      document.body.appendChild(script);
+
       return () => {
         const existingScript = document.getElementById("mcjs");
-        if (existingScript) {
-          existingScript.remove();
-        }
+        if (existingScript) existingScript.remove();
       };
     }
   }, []);
 
-  // Fixed play button - should play audio, not show email subscription
+  // Play button click handler
   const handlePlayClick = (recordUrl: string) => {
-    // If parent component provides onPlay handler, use it
     if (onPlay) {
       onPlay(recordUrl);
     } else {
-      // Fallback: create audio element and play
       const audio = new Audio(recordUrl);
-      audio.play().catch(error => {
-        console.error('Error playing audio:', error);
-        alert('Unable to play audio file');
+      audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+        alert("Unable to play audio file");
       });
     }
   };
 
-  // Separate email subscription trigger function
+  // Mailchimp subscribe button handler
   const handleSubscribeClick = () => {
-    // Use type assertion to access Mailchimp objects safely
-    const win = window as any;
-    
-    if (win.mcpopup) {
-      win.mcpopup.open();
-    } else if (win.mc4wp) {
-      win.mc4wp.forms.show();
+    if (!mailchimpReady) {
+      alert("Email subscription is still loading, please wait...");
+      return;
+    }
+
+    if (window.mcpopup) {
+      window.mcpopup.open();
+    } else if (window.mc4wp) {
+      window.mc4wp.forms.show();
     } else {
-      console.warn("Mailchimp popup not ready yet");
-      alert("Email subscription feature is loading, please try again later");
+      alert("Mailchimp popup not available");
     }
   };
 
   return (
     <div className="mt-6 w-full">
-      {/* Email subscription button - placed above table */}
       <div className="mb-4 text-center">
         <button
           onClick={handleSubscribeClick}
@@ -156,11 +151,9 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                 <td className="p-2 border">{rec.noiseLevel}</td>
                 <td className="p-2 border">{rec.clipLength}</td>
                 <td className="p-2 border w-24">
-                  {/* Fixed play button - now actually plays audio */}
                   <button
                     onClick={() => handlePlayClick(rec.recordUrl)}
                     className="text-black hover:text-green-600 p-2"
-                    title="Play recording"
                   >
                     <svg
                       width="20"
@@ -177,7 +170,6 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                     href={rec.recordUrl}
                     download
                     className="text-black hover:text-blue-600 p-2 flex justify-center items-center"
-                    title="Download recording"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +195,6 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
           </tbody>
         </table>
 
-        {/* Pagination */}
         <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
           <span>
             Showing {indexOfFirst + 1} - {indexOfFirst + currentRecords.length} of{" "}
@@ -243,33 +234,12 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Debug information */}
-      <div className="mt-4 p-3 bg-gray-100 rounded text-sm text-gray-600">
-        <p><strong>Debug Info:</strong></p>
-        <p>• Mailchimp script loaded: {document.getElementById("mcjs") ? "✅" : "❌"}</p>
-        <p>• If email subscription doesn't work, check browser console for errors</p>
-        <p>• Make sure Connected Sites is configured in your Mailchimp dashboard</p>
-        
-        <button
-          onClick={() => {
-            const win = window as any;
-            console.log('All window properties with "mc":', Object.keys(win).filter(key => key.toLowerCase().includes('mc')));
-            const hasPopup = !!win.mcpopup;
-            const hasMc4wp = !!win.mc4wp;
-            const hasMailChimp = !!win.MailChimp;
-            alert(`Debug: mcpopup=${hasPopup}, mc4wp=${hasMc4wp}, MailChimp=${hasMailChimp}`);
-          }}
-          className="mt-2 bg-gray-500 text-white px-3 py-1 rounded text-xs"
-        >
-          Debug Mailchimp Objects
-        </button>
-      </div>
     </div>
   );
 };
 
 export default AvailableRecordings;
+
 
 
 
