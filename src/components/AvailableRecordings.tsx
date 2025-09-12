@@ -13,6 +13,21 @@ type Recording = {
 interface AvailableRecordingsProps {
   recordings: Recording[];
   onLocationClick: (location: string) => void;
+  onPlay?: (url: string) => void; // Added optional onPlay prop
+}
+
+// Extend Window interface for Mailchimp objects
+declare global {
+  interface Window {
+    mcpopup?: {
+      open: () => void;
+    };
+    mc4wp?: {
+      forms: {
+        show: () => void;
+      };
+    };
+  }
 }
 
 // Fixed syntax error
@@ -21,6 +36,7 @@ const MAILCHIMP_SCRIPT = "https://chimpstatic.com/mcjs-connected/js/users/30e5b8
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
   onLocationClick,
+  onPlay, // Added onPlay prop
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -62,20 +78,28 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 
   // Fixed play button - should play audio, not show email subscription
   const handlePlayClick = (recordUrl: string) => {
-    // Create audio element and play
-    const audio = new Audio(recordUrl);
-    audio.play().catch(error => {
-      console.error('Error playing audio:', error);
-      alert('Unable to play audio file');
-    });
+    // If parent component provides onPlay handler, use it
+    if (onPlay) {
+      onPlay(recordUrl);
+    } else {
+      // Fallback: create audio element and play
+      const audio = new Audio(recordUrl);
+      audio.play().catch(error => {
+        console.error('Error playing audio:', error);
+        alert('Unable to play audio file');
+      });
+    }
   };
 
   // Separate email subscription trigger function
   const handleSubscribeClick = () => {
-    if (window.mcpopup) {
-      window.mcpopup.open();
-    } else if (window.mc4wp) {
-      window.mc4wp.forms.show();
+    // Use type assertion to access Mailchimp objects safely
+    const win = window as any;
+    
+    if (win.mcpopup) {
+      win.mcpopup.open();
+    } else if (win.mc4wp) {
+      win.mc4wp.forms.show();
     } else {
       console.warn("Mailchimp popup not ready yet");
       alert("Email subscription feature is loading, please try again later");
