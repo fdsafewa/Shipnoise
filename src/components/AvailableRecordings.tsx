@@ -16,7 +16,8 @@ interface AvailableRecordingsProps {
 }
 
 const MAILCHIMP_SCRIPT =
-  "https://chimpstatic.com/mcjs-connected/js/users/7debdfcc22e25ed8a19fe46bf/67f54397dd0ab3a31000b9405.js";
+  "const MAILCHIMP_SCRIPT =
+  "https://chimpstatic.com/mcjs-connected/js/users/30e5b89b891e7b961c63e7d39/2318c630b0adc777855362be3.js";
 
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
