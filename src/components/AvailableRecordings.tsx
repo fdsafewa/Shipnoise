@@ -51,10 +51,13 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 
   // Play button click handler
   const handlePlayClick = () => {
-    // Trigger Mailchimp popup if available
-    // @ts-ignore
-    window.mcpopup && window.mcpopup.open();
+    if (window.mcpopup) {
+      window.mcpopup.open();
+    } else {
+      console.warn("Mailchimp popup not ready yet");
+    }
   };
+  
 
   return (
     <div className="mt-6 w-full">
