@@ -12,25 +12,17 @@ type Recording = {
 
 interface AvailableRecordingsProps {
   recordings: Recording[];
-  onPlay: (url: string) => void;
   onLocationClick: (location: string) => void;
 }
 
-interface SubscriptionData {
-  name: string;
-  email: string;
-}
+const MAILCHIMP_SCRIPT =
+  "https://chimpstatic.com/mcjs-connected/js/users/7debdfcc22e25ed8a19fe46bf/67f54397dd0ab3a31000b9405.js";
 
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
   onLocationClick,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [showPopup, setShowPopup] = useState(false);
-  const [subscription, setSubscription] = useState<SubscriptionData>({
-    name: "",
-    email: "",
-  });
 
   const recordsPerPage = 5;
   const indexOfLast = currentPage * recordsPerPage;
@@ -42,51 +34,26 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
     if (pageNumber >= 1 && pageNumber <= totalPages) setCurrentPage(pageNumber);
   };
 
- 
-  const handlePlayClick = () => {
-    setShowPopup(true);
-  };
-
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const form = document.createElement("form");
-    form.action =
-      "https://YOUR_MAILCHIMP_URL_HERE"; 
-    form.method = "POST";
-    form.target = "_blank";
-
-    const nameInput = document.createElement("input");
-    nameInput.name = "FNAME";
-    nameInput.value = subscription.name;
-
-    const emailInput = document.createElement("input");
-    emailInput.name = "EMAIL";
-    emailInput.value = subscription.email;
-
-    form.appendChild(nameInput);
-    form.appendChild(emailInput);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
-
-    setShowPopup(false);
-    setSubscription({ name: "", email: "" });
-  };
-
-  // Mailchimp script
+  // Load Mailchimp script once
   useEffect(() => {
-    const script = document.createElement("script");
-    script.id = "mcjs";
-    script.src =
-      "https://chimpstatic.com/mcjs-connected/js/users/7debdfcc22e25ed8a19fe46bf/b4c5dd27f78ed5aa883612cb5.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
+    if (!document.getElementById("mcjs")) {
+      const script = document.createElement("script");
+      script.id = "mcjs";
+      script.src = MAILCHIMP_SCRIPT;
+      script.async = true;
+      document.body.appendChild(script);
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
   }, []);
+
+  // Play button click handler
+  const handlePlayClick = () => {
+    // Trigger Mailchimp popup if available
+    // @ts-ignore
+    window.mcpopup && window.mcpopup.open();
+  };
 
   return (
     <div className="mt-6 w-full">
@@ -209,57 +176,12 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Popup Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-80">
-            <h3 className="text-lg font-semibold mb-4">Subscribe to access</h3>
-            <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
-              <input
-                type="text"
-                placeholder="Name"
-                value={subscription.name}
-                onChange={(e) =>
-                  setSubscription({ ...subscription, name: e.target.value })
-                }
-                className="border p-2 rounded"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={subscription.email}
-                onChange={(e) =>
-                  setSubscription({ ...subscription, email: e.target.value })
-                }
-                className="border p-2 rounded"
-                required
-              />
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowPopup(false)}
-                  className="px-4 py-2 border rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 export default AvailableRecordings;
+
 
 
 
