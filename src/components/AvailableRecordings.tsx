@@ -24,7 +24,7 @@ declare global {
 }
 
 const MAILCHIMP_SCRIPT =
-  "https://chimpstatic.com/mcjs-connected/js/users/7debdfcc22e25ed8a19fe46bf/67f54397dd0ab3a31000b9405.js";
+  "https://chimpstatic.com/mcjs-connected/js/users/30e5b89b891e7b961c63e7d39/2318c630b0adc777855362be3.js";
 
 const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   recordings,
@@ -48,7 +48,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
     if (!document.getElementById("mcjs")) {
       const script = document.createElement("script");
       script.id = "mcjs";
-      script.src = MAILCHIMP_SCRIPT;
+      script.src = MAILCHIMP_SCRIPT + "?v=" + Math.random();
       script.async = true;
       document.body.appendChild(script);
     }
@@ -105,7 +105,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                 className="hover:bg-gray-50"
                 style={{ borderBottom: "1px solid #52525B" }} // Row horizontal line
               >
-                <td className="p-2 text-left font-semibold text-[14px]">{rec.vessel}</td>
+                <td className="p-2 text-left font-semibold text-[14px] text-gray-600">{rec.vessel}</td>
                 <td className="p-2 text-left font-semibold text-[14px]">
                   <button
                     className="text-blue-600 underline cursor-pointer"
@@ -114,8 +114,8 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                     {rec.location}
                   </button>
                 </td>
-                <td className="p-2 text-left font-semibold text-[14px]">{rec.date}</td>
-                <td className="p-2 text-left font-semibold text-[14px]">{rec.time}</td>
+                <td className="p-2 text-left font-semibold text-[14px] text-[#716E6E]">{rec.date}</td>
+                <td className="p-2 text-left font-semibold text-[14px] text-[#716E6E]">{rec.time}</td>
                 <td className="p-2 w-24 text-left font-semibold text-[14px]">
                   <button
                     onClick={() => handlePlayClick(rec.recordUrl)}
@@ -177,7 +177,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-2 disabled:opacity-50 bg-[#E5E7EB] text-black"
+              className="p-2 disabled:opacity-100 flex items-center bg-[#E5E7EB] text-[#4B5563]"
             >
               <span>&lt;</span> Previous
             </button>
@@ -202,12 +202,13 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 
             {/* Next button */}
             <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="p-2 disabled:opacity-50 flex items-center bg-[#E5E7EB] text-black"
-            >
-              Next <span className="ml-1">&gt;</span>
-            </button>
+  onClick={() => paginate(currentPage + 1)}
+  disabled={currentPage === totalPages}
+  className="p-2 disabled:opacity-100 flex items-center bg-[#E5E7EB] text-[#4B5563]"
+>
+  Next <span className="ml-1">&gt;</span>
+</button>
+
           </div>
         </div>
       </div>

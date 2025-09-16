@@ -205,7 +205,7 @@ const SelectionPanel = () => {
   <div className="w-[170px] h-[40px] mt-[37px] ">
   <button
     onClick={() => setShowRecordings(true)}
-    className="w-full h-full flex items-center justify-center bg-[#2D3147] text-white rounded-lg transition"
+    className="w-full h-full flex items-center justify-center bg-[#013C74] text-white rounded-lg transition"
   >
     Search
   </button>
