@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
+import VesselIcon from "../assets/VesselIcon.png"
 
 type Recording = {
   vessel: string;
   location: string;
   date: string;
   time: string;
-  noiseLevel: string;
-  clipLength: string;
   recordUrl: string;
 };
 
@@ -19,14 +18,8 @@ interface AvailableRecordingsProps {
 // Extend Window interface for Mailchimp objects
 declare global {
   interface Window {
-    mcpopup?: {
-      open: () => void;
-    };
-    mc4wp?: {
-      forms: {
-        show: () => void;
-      };
-    };
+    mcpopup?: { open: () => void };
+    mc4wp?: { forms: { show: () => void } };
   }
 }
 
@@ -57,9 +50,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
       script.id = "mcjs";
       script.src = MAILCHIMP_SCRIPT;
       script.async = true;
-
       document.body.appendChild(script);
-
     }
   }, []);
 
@@ -78,30 +69,44 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 
   return (
     <div className="mt-6 w-full">
-     
-      <div className="border border-gray-200 rounded-2xl p-4 shadow-md w-full">
-        <h3 className="text-xl font-semibold text-gray-800 mb-3 text-left">
-          Available Recordings
-        </h3>
+      {/* Container for table and header */}
+      <div className="w-full">
+        {/* Header with background color */}
+        <div
+          className="w-full p-3 flex items-center"
+          style={{ backgroundColor: "#2D3147", height: "51px" }}
+        >
+          <img src={VesselIcon} alt="icon" className="mr-2 w-6 h-6" />
+          <h3 className="text-xl font-semibold text-white mb-0 text-left">
+            Vessel Monitoring Data
+          </h3>
+        </div>
 
+        {/* Table */}
         <table className="w-full table-auto border-collapse text-center">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border">Vessel</th>
-              <th className="p-2 border">Location</th>
-              <th className="p-2 border">Date</th>
-              <th className="p-2 border">Time</th>
-              <th className="p-2 border">Noise Level</th>
-              <th className="p-2 border">Clip Length</th>
-              <th className="p-2 border">Play</th>
-              <th className="p-2 border">Download</th>
+            <tr
+              className="bg-[#E5E7EB] h-[46px]"
+              style={{ borderBottom: "1px solid #52525B" }} // Header bottom line
+            >
+              <th className="p-2 text-left text-[14px] font-normal">Vessel ID</th>
+              <th className="p-2 text-left text-[14px] font-normal">Hydrophone Location</th>
+              <th className="p-2 text-left text-[14px] font-normal ">Date</th>
+              <th className="p-2 text-left text-[14px] font-normal ">Time</th>
+              <th className="p-2 text-left text-[14px] font-normal ">Recording</th>
+              <th className="p-2 text-center text-[14px] font-normal">Download</th>
             </tr>
           </thead>
+
           <tbody>
             {currentRecords.map((rec, idx) => (
-              <tr key={idx} className="hover:bg-gray-50">
-                <td className="p-2 border">{rec.vessel}</td>
-                <td className="p-2 border">
+              <tr
+                key={idx}
+                className="hover:bg-gray-50"
+                style={{ borderBottom: "1px solid #52525B" }} // Row horizontal line
+              >
+                <td className="p-2 text-left font-semibold text-[14px]">{rec.vessel}</td>
+                <td className="p-2 text-left font-semibold text-[14px]">
                   <button
                     className="text-blue-600 underline cursor-pointer"
                     onClick={() => onLocationClick(rec.location)}
@@ -109,30 +114,30 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                     {rec.location}
                   </button>
                 </td>
-                <td className="p-2 border">{rec.date}</td>
-                <td className="p-2 border">{rec.time}</td>
-                <td className="p-2 border">{rec.noiseLevel}</td>
-                <td className="p-2 border">{rec.clipLength}</td>
-                <td className="p-2 border w-24">
+                <td className="p-2 text-left font-semibold text-[14px]">{rec.date}</td>
+                <td className="p-2 text-left font-semibold text-[14px]">{rec.time}</td>
+                <td className="p-2 w-24 text-left font-semibold text-[14px]">
                   <button
                     onClick={() => handlePlayClick(rec.recordUrl)}
-                    className="text-black hover:text-green-600 p-2"
+                    className="w-7 h-7 flex items-center justify-center rounded-full"
+                    style={{ backgroundColor: "#013C74" }}
                   >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                       <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="white"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M8 5v14l11-7z" />
+    </svg>
                   </button>
                 </td>
-                <td className="p-2 border w-24">
+                <td className="p-2 w-24 text-center">
                   <a
                     href={rec.recordUrl}
                     download
-                    className="text-black hover:text-blue-600 p-2 flex justify-center items-center"
+                    className="text-black p-2 flex justify-center items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -158,21 +163,26 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
           </tbody>
         </table>
 
-        <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+        {/* Pagination */}
+        <div className="flex justify-between items-center text-sm text-[#4B5563] bg-[#F9FAFB] h-[51px] px-4">
+          {/* Records info */}
           <span>
             Showing {indexOfFirst + 1} - {indexOfFirst + currentRecords.length} of{" "}
             {recordings.length} records
           </span>
 
+          {/* Pagination buttons */}
           <div className="flex items-center space-x-2">
+            {/* Previous button */}
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-2 disabled:opacity-50"
+              className="p-2 disabled:opacity-50 bg-[#E5E7EB] text-black"
             >
-              ◀
+              <span>&lt;</span> Previous
             </button>
 
+            {/* Page numbers */}
             {Array.from({ length: totalPages }, (_, idx) => (
               <button
                 key={idx + 1}
@@ -180,19 +190,23 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                 className={`w-8 h-8 flex items-center justify-center rounded ${
                   currentPage === idx + 1
                     ? "bg-black text-white"
-                    : "bg-white border border-gray-300 text-black hover:bg-gray-100"
+                    : "bg-white border border-gray-300 text-black"
                 }`}
+                style={{
+                  backgroundColor: currentPage === idx + 1 ? "#013C74" : undefined,
+                }}
               >
                 {idx + 1}
               </button>
             ))}
 
+            {/* Next button */}
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-2 disabled:opacity-50"
+              className="p-2 disabled:opacity-50 flex items-center bg-[#E5E7EB] text-black"
             >
-              ▶
+              Next <span className="ml-1">&gt;</span>
             </button>
           </div>
         </div>
@@ -202,6 +216,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
 };
 
 export default AvailableRecordings;
+
 
 
 
