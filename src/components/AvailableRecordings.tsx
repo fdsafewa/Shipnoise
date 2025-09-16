@@ -44,16 +44,17 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
   };
 
   // Load Mailchimp script once
-  useEffect(() => {
-    if (!document.getElementById("mcjs")) {
-      const script = document.createElement("script");
-      script.id = "mcjs";
-      script.src = MAILCHIMP_SCRIPT + "?v=" + Math.random();
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
 
+  useEffect(() => {
+    document.querySelectorAll('script[src*="chimpstatic"]').forEach(s => s.remove());
+  
+    const script = document.createElement("script");
+    script.id = "mcjs";
+    script.src = MAILCHIMP_SCRIPT + "?v=" + new Date().getTime();
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+  
   // Play button click handler
   const handlePlayClick = (recordUrl: string) => {
     if (onPlay) {
