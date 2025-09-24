@@ -59,7 +59,7 @@ const VesselInput: React.FC<VesselInputProps> = ({ options, onChange, placeholde
         value={inputValue}
         onChange={handleInputChange}
         placeholder={placeholder}
-        className="w-full h-full px-20 border border-gray-300 rounded-[4px] focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+        className="w-full h-full px-5 border border-gray-300 rounded-[4px] focus:outline-none focus:border-[#111827] text-left placeholder:text-left"
       />
       {showOptions && filteredOptions.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-[4px] max-h-48 overflow-y-auto z-10 shadow-lg bg-white">
@@ -173,28 +173,37 @@ const SelectionPanel = () => {
           {/* Search Inputs */}
           <div className="flex justify-center">
             <div
-              className="w-[520px] h-[200px] border-2 border-gray-200 rounded-[4px] px-4 pt-4 pb-[30px] hover:border-gray-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+              className="w-[520px] h-[200px] border-2 border-gray-200 rounded-[8px] flex flex-col"
+              style={{ padding: '25px' }}
             >
-              <div>
-                <label
-                  className="text-[18px] font-semibold mb-2 block text-left"
+              <div
+                className="w-[470px] h-[56px]"
+                style={{ marginBottom: '15px' }}
+              >
+                <div
+                  className="text-[18px] text-left font-semibold"
                   style={{ color: '#111827' }}
                 >
                   Search Vessel Noise Data
-                </label>
-                <p className="text-left text-[14px]" style={{ color: '#9CA3AF' }}>
+                </div>
+                <p className="mt-1 text-[14px] text-left" style={{ color: '#9CA3AF' }}>
                   Enter search criteria to find acoustic recordings from vessels
                 </p>
               </div>
 
-              <div className="flex items-end gap-4 mt-4">
+              <div className="flex items-end gap-4" style={{ marginTop: '15px' }}>
                 {/* Vessel container */}
-                <div className="w-[280px] h-[40px]">
-                  <VesselInput
-                    options={vesselOptions}
-                    onChange={setSelectedVessel}
-                    placeholder="Vessel ID"
-                  />
+                <div className="w-[280px] flex flex-col gap-2">
+                  <span className="w-[68px] h-[20px] text-[14px] font-medium" style={{ color: '#374151' }}>
+                    Vessel ID
+                  </span>
+                  <div className="h-[40px]">
+                    <VesselInput
+                      options={vesselOptions}
+                      onChange={setSelectedVessel}
+                      placeholder="Enter vessel ID"
+                    />
+                  </div>
                 </div>
 
                 {/* Search button */}
@@ -237,16 +246,4 @@ const SelectionPanel = () => {
 };
 
 export default SelectionPanel;
-
-
-
-
-
-
-
-
-
-
-
-
 
