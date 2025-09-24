@@ -3,6 +3,7 @@ import VesselIcon from "../assets/VesselIcon.png"
 import DownloadIcon from "../assets/dl.svg";
 import BackIcon from "../assets/back.svg";
 import ForwardIcon from "../assets/forward.svg";
+import PlayIcon from "../assets/playbutton.svg";
 
 type Recording = {
   vessel: string;
@@ -144,15 +145,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                       className="w-7 h-7 flex items-center justify-center rounded-full"
                       style={{ backgroundColor: "#013C74" }}
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="white"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                      <img src={PlayIcon} alt="Play" className="w-10 h-10" />
                     </button>
                     <a
                       href={rec.recordUrl}
@@ -163,7 +156,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
                       <img
                         src={DownloadIcon}
                         alt="Download icon"
-                        className="w-[15px] h-[15px] object-contain"
+                        className="w-[17px] h-[17px] object-contain"
                       />
                     </a>
                   </div>
