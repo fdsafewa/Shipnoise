@@ -89,10 +89,10 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
       <div className="w-full">
         {/* Header with background color */}
         <div
-          className="w-full p-3 flex items-center"
+          className="w-full px-[25px] py-3 flex items-center"
           style={{ backgroundColor: "#2D3147", height: "51px" }}
         >
-          <img src={VesselIcon} alt="icon" className="mr-2 w-6 h-6" />
+          <img src={VesselIcon} alt="icon" className="mr-2 w-5 h-6" />
           <h3 className="text-xl font-semibold text-white mb-0 text-left">
             Vessel Monitoring Data
           </h3>
@@ -167,7 +167,7 @@ const AvailableRecordings: React.FC<AvailableRecordingsProps> = ({
         </table>
 
         {/* Pagination */}
-        <div className="flex justify-between items-center text-sm text-[#4B5563] bg-[#F9FAFB] h-[51px] px-4">
+        <div className="flex justify-between items-center text-sm text-[#4B5563] bg-[#F9FAFB] h-[51px] px-[25px]">
           {/* Records info */}
           <span>
             Showing {indexOfFirst + 1} - {indexOfFirst + currentRecords.length} of{" "}
