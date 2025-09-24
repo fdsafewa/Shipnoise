@@ -2,10 +2,34 @@ import React, { useState } from 'react';
 import AudioWavePlayer from './AudioWavePlayer';
 import AvailableRecordings from './AvailableRecordings';
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+type VesselOption = {
+  name: string;
+  description?: string;
+};
+
+
+interface VesselInputProps {
+  options: VesselOption[];
+  onChange: (option: VesselOption) => void;
+  placeholder: string;
+}
+
+
+interface LocationModalProps {
+  location: string | null;
+  onClose: () => void;
+}
+
 // AutoComplete input for Vessel
-const VesselInput = ({ options, onChange, placeholder }: any) => {
+const VesselInput: React.FC<VesselInputProps> = ({ options, onChange, placeholder }) => {
   const [inputValue, setInputValue] = useState('');
-  const [filteredOptions, setFilteredOptions] = useState<any[]>([]);
+  const [filteredOptions, setFilteredOptions] = useState<VesselOption[]>([]);
   const [showOptions, setShowOptions] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,7 +37,7 @@ const VesselInput = ({ options, onChange, placeholder }: any) => {
     setInputValue(val);
 
     if (val.length > 0) {
-      const filtered = options.filter((opt: any) =>
+      const filtered = options.filter((opt: VesselOption) =>
         opt.name.toLowerCase().includes(val.toLowerCase())
       );
       setFilteredOptions(filtered);
@@ -23,24 +47,22 @@ const VesselInput = ({ options, onChange, placeholder }: any) => {
     }
   };
 
-  const handleSelect = (option: any) => {
+  const handleSelect = (option: VesselOption) => {
     setInputValue(option.name);
     setShowOptions(false);
     onChange(option);
   };
-
   return (
-    <div className="relative w-full">
-      <label className="text-l text-gray-800 mb-2 block text-left">{placeholder}</label>
+    <div className="relative w-full h-full">
       <input
         type="text"
         value={inputValue}
         onChange={handleInputChange}
         placeholder={placeholder}
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+        className="w-full h-full px-20 border border-gray-300 rounded-[4px] focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
       />
       {showOptions && filteredOptions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg max-h-48 overflow-y-auto z-10 shadow-lg bg-white">
+        <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-[4px] max-h-48 overflow-y-auto z-10 shadow-lg bg-white">
           {filteredOptions.map((opt, idx) => (
             <div
               key={idx}
@@ -57,35 +79,9 @@ const VesselInput = ({ options, onChange, placeholder }: any) => {
   );
 };
 
-// Date input supporting exact date or just month
-const DateInput = ({ date, onChange, mode }: any) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ type: mode, value: e.target.value });
-  };
-
-
-  return (
-    <div className="w-full">
-    <label className="text-[16px] text-gray-800 mb-2 block text-left">
-  {mode === 'month' ? 'Month' : 'Specific Date'}{' '}
-  {mode !== 'month' && (
-    <span className="text-[12px] text-[#9CA3AF]">(optional)</span>
-  )}
-</label>
-
-      <input
-        type={mode === 'month' ? 'month' : 'date'}
-        value={mode === 'month' ? date.monthValue : date.value}
-        onChange={handleChange}
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-      />
-    </div>
-  );
-};
-
 
 // Location Modal
-const LocationModal = ({ location, onClose }: any) => {
+const LocationModal: React.FC<LocationModalProps> = ({ location, onClose }) => {
   if (!location) return null;
 
   const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed`;
@@ -114,8 +110,7 @@ const LocationModal = ({ location, onClose }: any) => {
 
 // Main Selection Panel
 const SelectionPanel = () => {
-  const [selectedVessel, setSelectedVessel] = useState<any>('');
-  const [selectedDate, setSelectedDate] = useState<any>({ type: 'exact', value: '' });
+  const [selectedVessel, setSelectedVessel] = useState<VesselOption | null>(null);
   const [showRecordings, setShowRecordings] = useState(false);
   const [modalLocation, setModalLocation] = useState<string | null>(null);
   const [playingClip, setPlayingClip] = useState<string | null>(null);
@@ -159,73 +154,71 @@ const SelectionPanel = () => {
     },
   ];
 
+  const handleSearchClick = () => {
+    const vesselLabel = selectedVessel?.name ?? '';
+
+    window.gtag?.('event', 'vessel_search', {
+      event_category: 'selection_panel',
+      event_label: vesselLabel,
+      vessel: vesselLabel,
+    });
+
+    setShowRecordings(true);
+  };
+
   return (
     <div className="min-h-screen bg-white w-full">
-      <div className="w-[1200px] max-w-full mx-auto px-4 py-8">
-        {/* Vessel & Date Inputs */}
-        <div className="w-full border-2 border-gray-200 rounded-2xl p-4 hover:border-gray-400 hover:shadow-lg transition-all duration-300">
-        <label 
-  className="text-[18px] font-semibold mb-4 block text-left" 
-  style={{ color: "#111827" }}
->Search Vessel Noise Data</label>
-<p className="text-left text-[14px] block mt-0" style={{ color: "#9CA3AF" }}>
-    Enter search criteria to find acoustic recordings from vessels
-  </p>
+      <div className="w-full px-4 pt-[30px] pb-[30px]">
+      <div className="max-w-[1300px] mx-auto flex flex-col gap-[30px]">
+          {/* Search Inputs */}
+          <div className="flex justify-center">
+            <div
+              className="w-[520px] h-[200px] border-2 border-gray-200 rounded-[4px] px-4 pt-4 pb-[30px] hover:border-gray-400 hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+            >
+              <div>
+                <label
+                  className="text-[18px] font-semibold mb-2 block text-left"
+                  style={{ color: '#111827' }}
+                >
+                  Search Vessel Noise Data
+                </label>
+                <p className="text-left text-[14px]" style={{ color: '#9CA3AF' }}>
+                  Enter search criteria to find acoustic recordings from vessels
+                </p>
+              </div>
 
-  <div className="flex flex-wrap gap-4 mt-5 p-4">
-  {/* Vessel container */}
-  <div className="w-[280px] h-[70px]">
-    <VesselInput
-      options={vesselOptions}
-      value={selectedVessel}
-      onChange={setSelectedVessel}
-      placeholder="Vessel ID"
-    />
-  </div>
+              <div className="flex items-end gap-4 mt-4">
+                {/* Vessel container */}
+                <div className="w-[280px] h-[40px]">
+                  <VesselInput
+                    options={vesselOptions}
+                    onChange={setSelectedVessel}
+                    placeholder="Vessel ID"
+                  />
+                </div>
 
-  {/* Month container */}
-  <div className="w-[280px] h-[70px]">
-    <DateInput
-      date={selectedDate}
-      onChange={setSelectedDate}
-      mode="month" 
-    />
-  </div>
+                {/* Search button */}
+                <div className="w-[170px] h-[40px]">
+                  <button
+                    onClick={handleSearchClick}
+                    className="w-full h-full flex items-center justify-center bg-[#013C74] text-white rounded-none transition"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  {/* Exact Date container */}
-  <div className="w-[280px] h-[70px]">
-    <DateInput
-      date={selectedDate}
-      onChange={setSelectedDate}
-      mode="date" 
-    />
-  </div>
-
-  {/* Search button */}
-  <div className="w-[170px] h-[40px] mt-[37px] ">
-  <button
-    onClick={() => setShowRecordings(true)}
-    className="w-full h-full flex items-center justify-center bg-[#013C74] text-white rounded-lg transition"
-  >
-    Search
-  </button>
-</div>
-
-</div>
-
-
-</div>
-
-
-        {/* Recordings Table */}
-        {showRecordings && (
-          <AvailableRecordings 
-            recordings={sampleRecordings} 
-            onPlay={(url: string) => setPlayingClip(url)} 
-            onLocationClick={(location: string) => setModalLocation(location)} 
-          />
-        )}
-
+          {/* Recordings Table */}
+          {showRecordings && (
+            <AvailableRecordings
+              recordings={sampleRecordings}
+              onPlay={(url: string) => setPlayingClip(url)}
+              onLocationClick={(location: string) => setModalLocation(location)}
+            />
+          )}
+        </div>
       </div>
 
       <LocationModal
@@ -244,15 +237,6 @@ const SelectionPanel = () => {
 };
 
 export default SelectionPanel;
-
-
-
-
-
-
-
-
-
 
 
 
